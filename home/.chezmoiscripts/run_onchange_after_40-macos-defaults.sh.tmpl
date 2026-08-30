@@ -1,0 +1,47 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/sh
+# macOS system preferences. Curated on purpose -- a full `defaults export` dump
+# is unreadable and churns on every apply. Add a line here when you change a
+# setting in System Settings that you want to keep.
+#
+# Ends by restarting Dock/Finder/SystemUIServer, which briefly flashes the UI.
+set -eu
+
+echo "==> Applying macOS defaults"
+
+# --- Dock ---
+defaults write com.apple.dock autohide -bool true
+defaults write com.apple.dock tilesize -int 32
+defaults write com.apple.dock show-recents -bool false
+defaults write com.apple.dock mru-spaces -bool false   # don't reorder Spaces by use
+
+# --- Keyboard: fast repeat, no auto-correct fighting the terminal ---
+defaults write NSGlobalDomain KeyRepeat -int 2
+defaults write NSGlobalDomain InitialKeyRepeat -int 15
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool true
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+
+# --- Finder ---
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+defaults write com.apple.finder ShowPathbar -bool true
+defaults write com.apple.finder ShowStatusBar -bool true
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"   # list view
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"   # search current folder
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+
+# --- Screenshots ---
+mkdir -p "${HOME}/Desktop/Screenshots"
+defaults write com.apple.screencapture location -string "${HOME}/Desktop/Screenshots"
+defaults write com.apple.screencapture type -string "png"
+defaults write com.apple.screencapture disable-shadow -bool true
+
+# --- Misc ---
+defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true  # no .DS_Store on shares
+
+killall Dock Finder SystemUIServer 2>/dev/null || true
+echo "==> macOS defaults applied"
+{{- end }}
