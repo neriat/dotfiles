@@ -109,6 +109,32 @@ and `~/.config/<App>/User/` on Linux. The real files live in `~/.config`, and ma
 gets symlinks. If either app ever replaces a settings file instead of writing
 through the symlink, `chezmoi apply` restores the link.
 
+## Pushing to this repo (two GitHub accounts)
+
+This machine is signed in to GitHub as both `neriat` (personal, owns this repo)
+and `neria-blockaid` (work). Two things would otherwise send pushes to the wrong
+identity:
+
+- `~/.gitconfig` rewrites `https://github.com/` -> `git@github.com:`, and the
+  SSH key here belongs to the **work** account.
+- `gh auth`'s active account is global, so switching it would disturb work repos.
+
+Both are handled without touching either:
+
+```sh
+# remote carries the username, so the insteadOf rewrite does not match it
+git remote set-url origin https://neriat@github.com/neriat/dotfiles.git
+
+# repo-local credential helper pins this repo to neriat, whatever gh's active
+# account is. The empty first value resets the inherited helper chain.
+git config --local --replace-all credential.https://github.com.helper ""
+git config --local --add credential.https://github.com.helper \
+  '!f() { echo username=neriat; echo "password=$(gh auth token --user neriat)"; }; f'
+```
+
+This lives in `.git/config`, which is not tracked, so re-apply it after a fresh
+clone on another machine.
+
 ## Rotating the age key
 
 The key is the single point of failure for this repo. To rotate:
