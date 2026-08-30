@@ -1,0 +1,40 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/sh
+# Import whole preference domains captured with `macos-prefs capture`.
+#
+# macOS preferences cannot be tracked as plain files: cfprefsd caches each
+# domain in memory and overwrites direct writes. `defaults import` is the
+# supported path.
+#
+# This runs BEFORE 40-macos-defaults on purpose. `defaults import` merges the
+# plist into the domain, overwriting any key it contains, so the curated
+# `defaults write` settings in that script must be applied afterwards to win on
+# keys both of them touch (com.apple.dock).
+#
+# Because it merges rather than replaces, keys stripped at capture time
+# (recent-apps, mod-count, window geometry) simply stay as they are on the
+# machine -- stripping keeps the repo clean without deleting live state.
+#
+# Re-runs whenever any captured plist changes:
+{{ range (glob (joinPath .chezmoi.sourceDir "dot_config/private_macos-defaults/*")) -}}
+#   {{ base . }}: {{ include . | sha256sum }}
+{{ end -}}
+set -eu
+
+STORE="$HOME/.config/macos-defaults"
+[ -d "$STORE" ] || exit 0
+
+echo "==> Importing macOS preference domains"
+for plist in "$STORE"/*.plist; do
+    [ -e "$plist" ] || continue
+    domain=$(basename "$plist" .plist)
+    defaults import "$domain" "$plist" && echo "    $domain"
+done
+
+# An app that is running may rewrite its own prefs on quit, undoing the import.
+for app in Vorssaint Rectangle Maccy AltTab Shottr Lunar BetterDisplay MiddleClick; do
+    if pgrep -qx "$app" 2>/dev/null; then
+        echo "    NOTE: $app is running; quit and re-run 'chezmoi apply' if its settings do not stick."
+    fi
+done
+{{- end }}
