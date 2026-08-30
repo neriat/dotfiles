@@ -11,70 +11,11 @@ layout {
         }
     }
 
-    tab name="token-validation" {
-        pane stacked=true {
-            pane name="shell"                                  cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/token-validation"
-            pane name="cc ARR-45-honeypot-val-alignment"       cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/token-validation"
-            pane name="cc ARR-69-fin-stats-red-green"          cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/token-validation"
-            pane name="shell"                                  cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/token-validation"
-            pane name="shell"                                  cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/token-validation"
-        }
-    }
-
-    tab name="kong-tf" {
-        pane name="kong-tf" cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/kong-tf"
-    }
-
-    tab name="research" {
-        pane stacked=true {
-            pane name="research" cwd="/Users/neriatzidkani/Documents/research"
-            pane name="research" cwd="/Users/neriatzidkani/Documents/research"
-            pane name="research" cwd="/Users/neriatzidkani/Documents/research"
-        }
-    }
-
-    tab name="contract-llm-scanner" {
-        pane stacked=true {
-            pane name="contract-llm-scanner" cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/contract-llm-scanner"
-            pane name="contract-llm-scanner" cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/contract-llm-scanner"
-            pane name="contract-llm-scanner" cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/contract-llm-scanner"
-        }
-    }
-
-    tab name="solana" {
-        pane name="solana" cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/solana"
-    }
-
-    tab name="exploit-detection" {
-        pane stacked=true {
-            pane name="exploit-detection" cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/exploit-detection"
-            pane name="exploit-detection" cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/exploit-detection"
-        }
-    }
-
-    tab name="exploit-detection-monorepo" {
-        pane stacked=true {
-            pane name="Commit code changes"      cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/exploit-detection-monorepo"
-            pane name="exploit-detection-monorepo" cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/exploit-detection-monorepo"
-            pane name="contract-similarity"      cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/contract-similarity"
-        }
-    }
-
     tab name="MISC" {
         pane stacked=true {
             pane name="cc cost"                  cwd="/Users/neriatzidkani/Documents/repositories/deshraj/Claud-ometer"
-            pane name="empty-review-branch"      cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/crypto-course-yitzchak"
-            pane name="crypto-course-yitzchak"   cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/crypto-course-yitzchak"
-            pane name="onchain-tasker"           cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/onchain-tasker"
             pane name="Claud-ometer"             cwd="/Users/neriatzidkani/Documents/repositories/deshraj/Claud-ometer"
             pane name="repositories"             cwd="/Users/neriatzidkani/Documents/repositories"
-        }
-    }
-
-    tab name="tac-to-solidity" {
-        pane stacked=true {
-            pane name="decompiler-cycle-3-string-storage" cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/tac-to-solidity"
-            pane name="tac-to-solidity"                   cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/tac-to-solidity"
         }
     }
 
@@ -87,7 +28,4 @@ layout {
         }
     }
 
-    tab name="platform" {
-        pane name="platform" cwd="/Users/neriatzidkani/Documents/repositories/RectangelHelp/platform"
-    }
 }

@@ -79,21 +79,75 @@ The Claude Code CLI is deliberately *not* a Homebrew package -- it is installed 
 the method Anthropic documents. That script only installs when `claude` is missing,
 because Claude Code updates itself.
 
-## Vorssaint preferences
+## macOS settings
 
-macOS preferences cannot be tracked as plain files -- `cfprefsd` caches each domain in
-memory and overwrites direct writes. So the XML lives at
-`~/.config/vorssaint/com.vorssaint.utils.plist` and
-`run_onchange_after_50-vorssaint-prefs.sh.tmpl` applies it with `defaults import`.
+Three layers, in increasing order of bluntness:
 
-After changing settings in the Vorssaint UI, re-capture them:
+| Layer | Where | Use for |
+|---|---|---|
+| Curated `defaults write` | `run_onchange_after_40-macos-defaults.sh.tmpl` | System toggles you want stated explicitly and readably |
+| Whole-domain import | `~/.config/macos-defaults/*.plist` + `...35-import-macos-prefs...` | Third-party apps whose keys you don't know, and structures too complex to hand-write (keyboard shortcuts, menu-bar layout) |
+| Nothing | — | Mail, Safari, Passwords, FindMy, display arrangements: credential-bearing or machine-bound |
+
+Preferences cannot be tracked as plain files -- `cfprefsd` caches each domain in
+memory and overwrites direct writes -- so the plists are applied with
+`defaults import`. Script 35 runs **before** script 40 deliberately:
+`defaults import` merges its plist into the domain, overwriting any key it
+carries, so the curated writes must come after to win on keys both touch
+(`com.apple.dock`). Merging also means keys stripped at capture stay untouched on
+the machine.
+
+Tracked domains:
+
+```
+com.apple.symbolichotkeys       custom keyboard shortcuts
+com.apple.dock                  dock layout (recent-apps/mod-count stripped)
+com.apple.controlcenter         menu bar layout
+com.knollsoft.Rectangle         org.p0deje.Maccy
+com.lwouis.alt-tab-macos        art.ginzburg.MiddleClick
+com.vorssaint.utils
+cc.ffitch.shottr                encrypted -- holds a licence key
+fyi.lunar.Lunar                 encrypted -- holds a licence key
+pro.betterdisplay.BetterDisplay encrypted -- holds a licence key
+```
+
+### The `macos-prefs` helper
+
+`~/.local/bin/macos-prefs` (tracked at `home/dot_local/bin/`) does two jobs.
+
+**Re-capture** after changing settings in an app's UI:
 
 ```sh
-defaults export com.vorssaint.utils - > /tmp/v.plist
-# strip the volatile NSStatusItem*/NSWindow* geometry keys, then:
-cp /tmp/v.plist ~/.config/vorssaint/com.vorssaint.utils.plist
-chezmoi re-add ~/.config/vorssaint/com.vorssaint.utils.plist
+macos-prefs capture                 # refresh every tracked domain
+macos-prefs capture com.foo.bar     # start tracking a new one
+chezmoi re-add ~/.config/macos-defaults
 ```
+
+It strips volatile keys (`NSWindow*`, `NSStatusItem*`, `recent-apps`, `mod-count`)
+so captures don't churn.
+
+**Discover** which key a System Settings toggle writes -- macOS offers no way to
+ask this:
+
+```sh
+macos-prefs snap                    # snapshot all ~600 domains
+# ...flip the setting in System Settings...
+macos-prefs diff                    # prints the exact `defaults write` command
+```
+
+Paste the result into script 40. (This is what `plistwatch` does; it isn't in
+Homebrew, so it's reimplemented here.)
+
+### Permissions are not reproducible
+
+TCC privacy grants -- Accessibility, Screen Recording, Input Monitoring -- are
+SIP-protected and deliberately cannot be exported. On a new Mac, re-grant them by
+hand or these apps will silently do nothing:
+
+- **Accessibility:** Rectangle, Amethyst, AltTab, Maccy, MiddleClick, Vorssaint
+- **Screen Recording:** Shottr, AltTab
+- **Input Monitoring:** MiddleClick, Karabiner-Elements
+- **Full Disk Access:** any terminal you run `chezmoi apply` from
 
 ## Shell load order
 

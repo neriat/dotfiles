@@ -10,7 +10,7 @@ Library/**
 .config/cmux
 .config/karabiner
 .config/zellij
-.config/vorssaint
+.config/macos-defaults
 {{ end }}
 
 {{ if ne .profile "work" }}

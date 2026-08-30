@@ -1,0 +1,120 @@
+#!/bin/bash
+# macos-prefs -- capture and discover macOS preference settings.
+#
+#   macos-prefs list                  show tracked domains
+#   macos-prefs capture [domain...]   re-export tracked (or named) domains
+#   macos-prefs snap                  snapshot all domains (before changing a setting)
+#   macos-prefs diff                  show what changed since `snap`, as defaults commands
+#
+# Why this exists: macOS gives no way to ask "which key does this System Settings
+# toggle write?". `snap` + `diff` answers that. `plistwatch` does the same thing
+# but is not in Homebrew.
+set -euo pipefail
+
+STORE="${XDG_CONFIG_HOME:-$HOME/.config}/macos-defaults"
+SNAP="${TMPDIR:-/tmp}/macos-prefs-snapshot"
+
+# Keys stripped on capture: window geometry and other per-session churn that
+# would otherwise make every capture a dirty diff.
+VOLATILE_PREFIXES='NSStatusItem NSWindow NSToolbar NSNavPanel NSSplitView'
+VOLATILE_EXACT='recent-apps mod-count region lastUsed lastCheck LastUsed'
+
+_domains() {
+    defaults domains | tr ',' '\n' | sed 's/^ *//' | grep -v '^$'
+}
+
+_strip() {  # stdin: plist xml -> stdout: plist xml, volatile keys removed
+    python3 -c '
+import plistlib, sys
+pref = sys.argv[1].split(); exact = set(sys.argv[2].split())
+try:
+    d = plistlib.loads(sys.stdin.buffer.read())   # loads(): a pipe is not seekable
+except Exception:
+    sys.exit(1)
+if not isinstance(d, dict): sys.exit(1)
+for k in [k for k in d if k.startswith(tuple(pref)) or k in exact]:
+    del d[k]
+sys.stdout.buffer.write(plistlib.dumps(d, fmt=plistlib.FMT_XML, sort_keys=True))
+' "$VOLATILE_PREFIXES" "$VOLATILE_EXACT"
+}
+
+cmd_list() {
+    [ -d "$STORE" ] || { echo "no tracked domains yet ($STORE does not exist)"; return; }
+    for f in "$STORE"/*.plist; do [ -e "$f" ] || continue
+        printf '  %-38s %6s bytes\n' "$(basename "$f" .plist)" "$(wc -c < "$f" | tr -d ' ')"
+    done
+}
+
+cmd_capture() {
+    mkdir -p "$STORE"
+    local doms=("$@")
+    if [ ${#doms[@]} -eq 0 ]; then
+        for f in "$STORE"/*.plist; do [ -e "$f" ] || continue; doms+=("$(basename "$f" .plist)"); done
+    fi
+    [ ${#doms[@]} -gt 0 ] || { echo "nothing to capture"; return 1; }
+    for d in "${doms[@]}"; do
+        if defaults export "$d" - 2>/dev/null | _strip > "$STORE/$d.plist.tmp" 2>/dev/null; then
+            mv "$STORE/$d.plist.tmp" "$STORE/$d.plist"
+            printf '  captured %-38s %6s bytes\n' "$d" "$(wc -c < "$STORE/$d.plist" | tr -d ' ')"
+        else
+            rm -f "$STORE/$d.plist.tmp"; echo "  SKIP $d (no such domain, or not a dict)" >&2
+        fi
+    done
+    echo
+    echo "Now run:  chezmoi re-add $STORE"
+}
+
+cmd_snap() {
+    rm -rf "$SNAP"; mkdir -p "$SNAP"
+    local n=0
+    while read -r d; do
+        defaults export "$d" - 2>/dev/null > "$SNAP/${d//\//_}.plist" && n=$((n+1))
+    done < <(_domains)
+    echo "snapshotted $n domains -> $SNAP"
+    echo "Now change the setting in System Settings, then run: macos-prefs diff"
+}
+
+cmd_diff() {
+    [ -d "$SNAP" ] || { echo "no snapshot; run 'macos-prefs snap' first" >&2; return 1; }
+    local found=0
+    while read -r d; do
+        local old="$SNAP/${d//\//_}.plist"
+        # A domain created since the snapshot has no baseline file; treat it as
+        # empty so every one of its keys shows up as an addition.
+        [ -f "$old" ] || old=/dev/null
+        local new; new=$(mktemp)
+        defaults export "$d" - 2>/dev/null > "$new" || { rm -f "$new"; continue; }
+        if ! cmp -s "$old" "$new"; then
+            found=1
+            python3 -c '
+import plistlib, sys
+dom = sys.argv[3]
+def load(p):
+    try: return plistlib.load(open(p,"rb"))
+    except Exception: return {}
+a, b = load(sys.argv[1]), load(sys.argv[2])
+if not isinstance(a, dict) or not isinstance(b, dict): sys.exit()
+def fmt(k, v):
+    if isinstance(v, bool):  return f"defaults write {dom} {k!r} -bool {str(v).lower()}"
+    if isinstance(v, int):   return f"defaults write {dom} {k!r} -int {v}"
+    if isinstance(v, float): return f"defaults write {dom} {k!r} -float {v}"
+    if isinstance(v, str):   return f"defaults write {dom} {k!r} -string {v!r}"
+    return f"# {dom} {k!r} is a {type(v).__name__} -- use `defaults import` for this one"
+for k in sorted(set(b) - set(a)):      print("  +", fmt(k, b[k]))
+for k in sorted(set(a) & set(b)):
+    if a[k] != b[k]:                   print("  ~", fmt(k, b[k]))
+for k in sorted(set(a) - set(b)):      print(f"  -  defaults delete {dom} {k!r}")
+' "$old" "$new" "$d"
+        fi
+        rm -f "$new"
+    done < <(_domains)
+    [ "$found" -eq 1 ] || echo "  no differences since the snapshot"
+}
+
+case "${1:-}" in
+    list)    shift; cmd_list "$@" ;;
+    capture) shift; cmd_capture "$@" ;;
+    snap)    shift; cmd_snap "$@" ;;
+    diff)    shift; cmd_diff "$@" ;;
+    *) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac
