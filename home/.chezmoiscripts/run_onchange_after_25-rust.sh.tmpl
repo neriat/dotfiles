@@ -1,0 +1,48 @@
+#!/bin/sh
+# Rust toolchain + cargo-installed binaries, driven by the repo-root Cargofile.
+#
+# Re-runs when the Cargofile changes:
+#   Cargofile: {{ include "../Cargofile" | sha256sum }}
+set -eu
+
+CARGOFILE="{{ .chezmoi.sourceDir }}/../Cargofile"
+[ -f "$CARGOFILE" ] || exit 0
+
+# --- rustup ------------------------------------------------------------------
+# --no-modify-path: ~/.zshenv already sources ~/.cargo/env and is chezmoi-managed,
+# so letting the installer append its own line would duplicate it.
+if ! command -v rustup >/dev/null 2>&1 && [ ! -x "$HOME/.cargo/bin/rustup" ]; then
+    echo "==> Installing rustup"
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+        | sh -s -- -y --no-modify-path
+fi
+[ -r "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+command -v cargo >/dev/null 2>&1 || { echo "cargo still not on PATH; aborting" >&2; exit 1; }
+
+# --- toolchains ---------------------------------------------------------------
+installed_toolchains=$(rustup toolchain list 2>/dev/null || true)
+grep -E '^toolchain ' "$CARGOFILE" | while read -r _ name; do
+    case "$installed_toolchains" in
+        *"$name"*) ;;
+        *) echo "==> rustup toolchain install $name"; rustup toolchain install "$name" ;;
+    esac
+done
+
+# --- crates -------------------------------------------------------------------
+# `cargo install --list` is the source of truth for what is already present, so
+# re-running this is cheap and never rebuilds an existing binary.
+installed_crates=" $(cargo install --list 2>/dev/null | grep -E '^[a-zA-Z]' | cut -d' ' -f1 | tr '\n' ' ')"  # space-delimited: the case match below needs it on one line
+grep -E '^crate ' "$CARGOFILE" | sed 's/#.*//' | while read -r _ name args; do
+    [ -n "$name" ] || continue
+    case "$installed_crates " in
+        *" $name "*) continue ;;
+    esac
+    echo "==> cargo install $name $args"
+    if [ -z "$args" ] && command -v cargo-binstall >/dev/null 2>&1; then
+        # prebuilt binary if one exists, otherwise fall back to building
+        cargo binstall --no-confirm "$name" || cargo install "$name"
+    else
+        # shellcheck disable=SC2086
+        cargo install $args "$name"
+    fi
+done

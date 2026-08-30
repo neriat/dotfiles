@@ -62,6 +62,33 @@ chezmoi cd                        # shell into the source dir to commit/push
 chezmoi --refresh-externals apply # force-refresh oh-my-zsh & plugins
 ```
 
+## Rust
+
+`rustup` is installed from <https://sh.rustup.rs> by
+`run_onchange_after_25-rust.sh.tmpl`, **not** Homebrew -- brew's `rust` formula and
+rustup-managed toolchains both want to own `~/.cargo/bin`. The installer runs with
+`--no-modify-path` because `~/.zshenv` (chezmoi-managed) already sources
+`~/.cargo/env`.
+
+Toolchains and cargo-installed binaries live in the repo-root **`Cargofile`**, in
+the same spirit as the Brewfiles:
+
+```
+toolchain stable
+crate mdbook
+crate avm --git https://github.com/coral-xyz/anchor
+```
+
+The script consults `cargo install --list` before installing anything, so
+re-applying never rebuilds an existing binary, and uses `cargo-binstall` for
+prebuilt artifacts where one exists.
+
+Two things deliberately absent: the pinned `1.81.0` / `1.86.0` / `1.90.0`
+toolchains (projects pull those in via `rust-toolchain.toml`) and the `solana`
+toolchain (registered by Solana tooling with `rustup toolchain link`, not
+installable from a manifest). `clodashboard` is also skipped -- it installs from a
+local checkout path that won't exist on a new machine.
+
 ## Apps installed by hand
 
 `brew bundle` runs with `HOMEBREW_CASK_OPTS="--adopt"` (set in
