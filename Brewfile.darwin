@@ -1,0 +1,52 @@
+# macOS-only: formulae with no Linux equivalent, all casks, and Mac App Store apps.
+# Applied in addition to Brewfile when .chezmoi.os == "darwin".
+
+tap "leaperone/smctl"
+tap "aiherd-dev/aiherd"
+
+# --- macOS-only formulae ---
+brew "cocoapods"
+brew "xcodegen"
+brew "mas"                  # Mac App Store CLI, drives the mas section below
+brew "terminal-notifier"
+brew "leaperone/smctl/smctl"
+
+# --- terminals & shell UI ---
+cask "ghostty"              # primary terminal; config is cross-platform
+cask "alacritty"
+cask "warp"
+cask "font-hack-nerd-font"  # powerlevel10k glyphs
+cask "font-fontawesome"
+
+# --- window management / desktop ---
+cask "amethyst"
+cask "maccy"
+cask "middleclick"
+cask "notunes"
+cask "raycast"
+cask "meetingbar"
+cask "stats"
+cask "pushplaylabs-sidekick"
+cask "vorssaint"
+
+# --- dev tools ---
+cask "1password-cli"
+cask "gitkraken"
+cask "dbeaver-community"
+cask "pgadmin4"
+cask "marta"
+cask "codex"
+cask "aiherd-dev/aiherd/aiherd"
+cask "android-platform-tools"
+cask "snowflake-snowsql"
+cask "powershell"
+cask "temurin@11"
+cask "temurin@17"
+cask "localsend"
+
+# --- Mac App Store ---
+mas "1Password for Safari", id: 1569813296
+mas "OneLogin for Safari",  id: 1475824389
+mas "Numbers",              id: 361304891
+mas "Xcode",                id: 497799835
+mas "HP Easy Scan",         id: 967004861

@@ -1,0 +1,28 @@
+#!/bin/sh
+# Install packages from the Brewfiles at the repo root.
+#
+# The hashes below are what make `run_onchange_` fire: chezmoi re-runs this
+# script whenever its rendered content changes, so editing either Brewfile
+# changes a hash, which changes this file, which re-runs the install.
+#   Brewfile        hash: {{ include "../Brewfile" | sha256sum }}
+{{- if eq .chezmoi.os "darwin" }}
+#   Brewfile.darwin hash: {{ include "../Brewfile.darwin" | sha256sum }}
+{{- end }}
+set -eu
+
+SRC="{{ .chezmoi.sourceDir }}/.."
+
+if ! command -v brew >/dev/null 2>&1; then
+{{ if eq .chezmoi.os "darwin" -}}
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+{{- else -}}
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+{{- end }}
+fi
+
+echo "==> brew bundle: Brewfile"
+brew bundle --file="$SRC/Brewfile" --no-upgrade
+{{ if eq .chezmoi.os "darwin" }}
+echo "==> brew bundle: Brewfile.darwin"
+brew bundle --file="$SRC/Brewfile.darwin" --no-upgrade
+{{- end }}
