@@ -15,11 +15,17 @@ brew "leaperone/smctl/smctl"
 cask "ghostty"              # primary terminal; config is cross-platform
 cask "alacritty"
 cask "warp"
+cask "cmux"                 # terminal multiplexer; config in ~/.config/cmux
 cask "font-hack-nerd-font"  # powerlevel10k glyphs
+cask "font-jetbrains-mono-nerd-font"
 cask "font-fontawesome"
 
 # --- window management / desktop ---
 cask "amethyst"
+cask "rectangle"
+cask "lunar"                # external-display brightness
+cask "betterdisplay"
+cask "shottr"               # screenshot/annotation
 cask "maccy"
 cask "middleclick"
 cask "notunes"
@@ -30,7 +36,13 @@ cask "pushplaylabs-sidekick"
 cask "vorssaint"
 
 # --- dev tools ---
+cask "1password"
 cask "1password-cli"
+cask "cursor"               # settings tracked at ~/.config/Cursor/User
+cask "visual-studio-code"   # settings tracked at ~/.config/Code/User
+cask "claude"               # Claude desktop app (the CLI is installed by script 30)
+cask "obsidian"
+cask "postman"
 cask "gitkraken"
 cask "dbeaver-community"
 cask "pgadmin4"
@@ -43,6 +55,19 @@ cask "powershell"
 cask "temurin@11"
 cask "temurin@17"
 cask "localsend"
+
+# --- browsers ---
+cask "google-chrome"
+cask "zen"
+
+# --- communication ---
+cask "slack"
+cask "telegram"
+cask "whatsapp"
+
+# --- media ---
+cask "iina"
+cask "vlc"
 
 # --- Mac App Store ---
 mas "1Password for Safari", id: 1569813296
