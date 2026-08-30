@@ -1,0 +1,30 @@
+# Rust toolchains and cargo-installed binaries.
+#
+# rustup itself is installed by .chezmoiscripts/run_onchange_after_25-rust.sh.tmpl
+# via https://sh.rustup.rs -- the method the Rust project documents. It is
+# deliberately NOT a Homebrew formula: brew's rust and rustup-managed toolchains
+# fight over ~/.cargo/bin.
+#
+# Format:  toolchain <name>
+#          crate <name> [extra cargo-install args]
+
+toolchain stable
+toolchain nightly
+
+# Not listed: 1.81.0 / 1.86.0 / 1.90.0 are pulled in automatically by projects
+# with a rust-toolchain.toml, and the `solana` toolchain is registered by Solana
+# tooling with `rustup toolchain link`, so neither can be installed from here.
+
+crate cargo-binstall            # used below to fetch prebuilt binaries where possible
+crate mdbook
+crate sleek
+crate typeshare-cli
+crate zellij
+
+crate avm          --git https://github.com/coral-xyz/anchor
+crate heimdall-cli --git https://github.com/Jon-Becker/heimdall-rs
+crate lutetia      --git https://github.com/jose-compu/lutetia
+
+# Not listed: clodashboard is installed from a local path
+# (~/Documents/repositories/elazarl/clodashboard) and cannot be reproduced on a
+# machine that does not already have that checkout.
