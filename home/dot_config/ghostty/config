@@ -1,0 +1,8 @@
+theme = Monokai Pro Spectrum
+# theme = One Half Dark
+# theme = Violet Dark
+
+# Left Option acts as Alt, so opt+arrow sends CSI 1;3D / 1;3C.
+# Word-jump is bound in ~/.zshrc -- Ghostty 1.3.x silently drops any
+# keybind on alt+arrow_left / alt+arrow_right, so it cannot be done here.
+macos-option-as-alt = left

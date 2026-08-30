@@ -1,0 +1,33 @@
+# Managed by chezmoi. Edit with: chezmoi edit ~/.zshrc
+#
+# Load order matters:
+#   1. p10k instant prompt     -- must be first; nothing may write to stdout above it
+#   2. ~/.config/zsh/*.zsh     -- 00-path.zsh sets fpath, then 10-omz.zsh sources
+#                                 oh-my-zsh, which runs the session's single compinit
+#   3. ~/.devrc, ~/.blockaidrc -- sourced under `set -a` so bare assignments export.
+#                                 MUST come after step 2: .blockaidrc calls `compdef`,
+#                                 which does not exist until compinit has run.
+#   4. ~/.p10k.zsh             -- prompt theme
+
+# 1. Powerlevel10k instant prompt. Keep at the very top.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# 2. Modular fragments, numeric order. 99-local.zsh is untracked (per-machine).
+for _zfrag in "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/*.zsh(N); do
+  source "$_zfrag"
+done
+unset _zfrag
+
+# 3. Env files. `set -a` auto-exports bare NAME=value assignments inside them.
+set -a
+[[ -r "$HOME/.devrc" ]]      && source "$HOME/.devrc"
+[[ -r "$HOME/.blockaidrc" ]] && source "$HOME/.blockaidrc"
+set +a
+
+# Collapse duplicate PATH/fpath entries, keeping first occurrence (= precedence).
+typeset -U path fpath
+
+# 4. Prompt theme.
+[[ ! -f "$HOME/.p10k.zsh" ]] || source "$HOME/.p10k.zsh"

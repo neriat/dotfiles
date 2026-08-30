@@ -1,0 +1,70 @@
+# Repo-only files, never applied to $HOME
+README.md
+
+# Per-machine escape hatch: sourced by ~/.zshrc if present, never tracked
+.config/zsh/99-local.zsh
+
+{{ if ne .chezmoi.os "darwin" }}
+# --- macOS-only ---
+Library/**
+.config/cmux
+.config/karabiner
+.config/zellij
+{{ end }}
+
+{{ if ne .profile "work" }}
+# Work credentials: only applied on a machine initialized with profile=work
+.blockaidrc
+{{ end }}
+
+# --- Deliberately untracked: volatile state, caches, or dropped tools ---
+.ssh/known_hosts
+.ssh/known_hosts.old
+.ssh/agent
+
+# Dropped tools (see README)
+.config/nvim
+.config/fish
+.config/sketchybar
+.config/gcloud
+
+# Caches / machine-generated / too large to be worth versioning
+.config/raycast
+.config/github-copilot
+.config/darktable
+.config/containers
+.config/iterm2
+.config/gtk-3.0
+.config/configstore
+.config/code-server
+.config/cagent
+.config/karabiner/automatic_backups
+
+# ~/.claude: track config, ignore session state
+.claude/projects
+.claude/sessions
+.claude/session-env
+.claude/history.jsonl
+.claude/cache
+.claude/plugins
+.claude/paste-cache
+.claude/file-history
+.claude/debug
+.claude/ide
+.claude/jobs
+.claude/run
+.claude/daemon
+.claude/daemon*
+.claude/backups
+.claude/_backups
+.claude/chrome
+.claude/statsig
+.claude/todos
+.claude/shell-snapshots
+.claude/.last-*
+.claude/*.bak
+.claude/*.bak.*
+.claude/*cache*.json
+.claude/policy-limits.json
+.claude/remote-settings.json
+.claude/.settings.lock

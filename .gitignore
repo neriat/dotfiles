@@ -1,0 +1,4 @@
+# The age identity must never be committed -- it lives at ~/.config/chezmoi/key.txt
+# and is backed up in 1Password. Belt-and-braces in case it is ever copied here.
+key.txt
+*.age.key

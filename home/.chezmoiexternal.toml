@@ -1,0 +1,53 @@
+# oh-my-zsh and its custom plugins/theme, fetched as tarballs rather than
+# vendored into this repo. Refreshed weekly; force with `chezmoi --refresh-externals apply`.
+#
+# NOTE: none of these use `exact = true` -- ~/.oh-my-zsh/custom must keep the
+# plugin directories that the entries below drop inside it.
+
+[".oh-my-zsh"]
+    type = "archive"
+    url = "https://github.com/ohmyzsh/ohmyzsh/archive/master.tar.gz"
+    stripComponents = 1
+    refreshPeriod = "168h"
+
+[".oh-my-zsh/custom/themes/powerlevel10k"]
+    type = "archive"
+    url = "https://github.com/romkatv/powerlevel10k/archive/master.tar.gz"
+    stripComponents = 1
+    refreshPeriod = "168h"
+
+[".oh-my-zsh/custom/plugins/zsh-autosuggestions"]
+    type = "archive"
+    url = "https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz"
+    stripComponents = 1
+    refreshPeriod = "168h"
+
+[".oh-my-zsh/custom/plugins/zsh-syntax-highlighting"]
+    type = "archive"
+    url = "https://github.com/zsh-users/zsh-syntax-highlighting/archive/master.tar.gz"
+    stripComponents = 1
+    refreshPeriod = "168h"
+
+[".oh-my-zsh/custom/plugins/you-should-use"]
+    type = "archive"
+    url = "https://github.com/MichaelAquilina/zsh-you-should-use/archive/master.tar.gz"
+    stripComponents = 1
+    refreshPeriod = "168h"
+
+[".oh-my-zsh/custom/plugins/zsh-bat"]
+    type = "archive"
+    url = "https://github.com/fdellwing/zsh-bat/archive/master.tar.gz"
+    stripComponents = 1
+    refreshPeriod = "168h"
+
+[".oh-my-zsh/custom/plugins/zsh-eza"]
+    type = "archive"
+    url = "https://github.com/z-shell/zsh-eza/archive/main.tar.gz"
+    stripComponents = 1
+    refreshPeriod = "168h"
+
+[".oh-my-zsh/custom/plugins/autoswitch_virtualenv"]
+    type = "archive"
+    url = "https://github.com/MichaelAquilina/zsh-autoswitch-virtualenv/archive/master.tar.gz"
+    stripComponents = 1
+    refreshPeriod = "168h"
