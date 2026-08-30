@@ -12,6 +12,14 @@ set -eu
 
 SRC="{{ .chezmoi.sourceDir }}/.."
 
+# Many GUI apps on an existing machine were installed by hand (dragged from a
+# .dmg), so Homebrew does not own them and would abort with "It seems there is
+# already an App at ...". --adopt makes brew take over the existing bundle in
+# place instead. No-op on a clean machine. Adoption is refused when the on-disk
+# artifact differs from the cask version -- fix those individually, don't --force
+# blindly.
+export HOMEBREW_CASK_OPTS="--adopt"
+
 if ! command -v brew >/dev/null 2>&1; then
 {{ if eq .chezmoi.os "darwin" -}}
     eval "$(/opt/homebrew/bin/brew shellenv)"

@@ -10,6 +10,7 @@ Library/**
 .config/cmux
 .config/karabiner
 .config/zellij
+.config/vorssaint
 {{ end }}
 
 {{ if ne .profile "work" }}

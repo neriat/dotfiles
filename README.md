@@ -62,6 +62,39 @@ chezmoi cd                        # shell into the source dir to commit/push
 chezmoi --refresh-externals apply # force-refresh oh-my-zsh & plugins
 ```
 
+## Apps installed by hand
+
+`brew bundle` runs with `HOMEBREW_CASK_OPTS="--adopt"` (set in
+`run_onchange_after_20-brew-bundle.sh.tmpl`). Most GUI apps here were originally
+dragged from a `.dmg`, so Homebrew did not own them and would otherwise abort with
+*"It seems there is already an App at ..."*. `--adopt` takes over the existing bundle
+in place -- nothing is re-downloaded and nothing is deleted.
+
+Adoption is refused when the on-disk artifact differs from the cask's version. Fix
+those one at a time (check the version, then `brew install --cask --force <name>` if
+replacing it is genuinely what you want) rather than adding `--force` globally.
+
+The Claude Code CLI is deliberately *not* a Homebrew package -- it is installed by
+`run_onchange_after_30-claude-code.sh` via `curl -fsSL https://claude.ai/install.sh | bash`,
+the method Anthropic documents. That script only installs when `claude` is missing,
+because Claude Code updates itself.
+
+## Vorssaint preferences
+
+macOS preferences cannot be tracked as plain files -- `cfprefsd` caches each domain in
+memory and overwrites direct writes. So the XML lives at
+`~/.config/vorssaint/com.vorssaint.utils.plist` and
+`run_onchange_after_50-vorssaint-prefs.sh.tmpl` applies it with `defaults import`.
+
+After changing settings in the Vorssaint UI, re-capture them:
+
+```sh
+defaults export com.vorssaint.utils - > /tmp/v.plist
+# strip the volatile NSStatusItem*/NSWindow* geometry keys, then:
+cp /tmp/v.plist ~/.config/vorssaint/com.vorssaint.utils.plist
+chezmoi re-add ~/.config/vorssaint/com.vorssaint.utils.plist
+```
+
 ## Shell load order
 
 `~/.zshrc` is deliberately thin. Order matters:
@@ -91,11 +124,28 @@ zellij are skipped off macOS.
 | Thing | Why |
 |---|---|
 | `~/.ssh/known_hosts` | machine-accumulated; constant diff noise |
-| `~/.config/raycast` | 79 MB of extension bundles; use Raycast's own cloud sync |
+| `~/.config/raycast` | 79 MB of extension bundles |
+| Raycast shortcuts/aliases | see below -- not extractable |
 | `~/.config/gcloud` | 89 MB of cached credentials and components |
 | `~/.claude/{projects,sessions,history.jsonl,cache,plugins}` | volatile session state |
 | nvim, fish, sketchybar, aerospace configs | dropped on purpose |
 | pyenv, pipx, nvm, gcloud | dropped; `fnm` is the Node manager now |
+
+### Raycast shortcuts
+
+Raycast's aliases, hotkeys, quicklinks and snippets are **not** recoverable from this
+repo, and three routes were checked:
+
+- Its SQLite databases are SQLCipher-encrypted (`main.db` does not start with
+  `SQLite format 3`), so `sqlite3` cannot read them.
+- Cloud Sync needs Raycast Pro (`subscriptions_active = 0` here).
+- `com.raycast.macos.plist` holds only window geometry and migration flags -- no
+  shortcuts -- and the 426 MB support directory also contains clipboard history, so
+  neither is safe or useful to track.
+
+The only export is a Raycast *command*, not a Settings page: open Raycast and search
+**"Export Settings & Data"**. It asks for an encryption password and a save location,
+so it cannot be scripted. Drop the resulting `.rayconfig` in this repo to version it.
 
 `aerospace` is still installed on this Mac but intentionally absent from
 `Brewfile.darwin`, so a new machine will not get it.

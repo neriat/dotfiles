@@ -1,0 +1,27 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/sh
+# Import Vorssaint preferences.
+#
+# macOS preferences must NOT be written as plain files: cfprefsd caches the
+# domain in memory and will overwrite a direct write. `defaults import` is the
+# supported path.
+#
+# The hash below re-triggers this script when the tracked plist changes:
+#   com.vorssaint.utils.plist: {{ include "dot_config/vorssaint/com.vorssaint.utils.plist" | sha256sum }}
+#
+# To capture changes made in the Vorssaint UI:
+#   defaults export com.vorssaint.utils - > /tmp/v.plist   # then strip NSStatusItem*/NSWindow* keys
+#   chezmoi re-add ~/.config/vorssaint/com.vorssaint.utils.plist
+set -eu
+
+PLIST="$HOME/.config/vorssaint/com.vorssaint.utils.plist"
+[ -f "$PLIST" ] || exit 0
+
+if pgrep -qx Vorssaint 2>/dev/null; then
+    echo "==> WARNING: Vorssaint is running; it may rewrite its preferences on quit."
+    echo "    Quit it and re-run 'chezmoi apply' if the imported settings do not stick."
+fi
+
+echo "==> Importing Vorssaint preferences"
+defaults import com.vorssaint.utils "$PLIST"
+{{- end }}
