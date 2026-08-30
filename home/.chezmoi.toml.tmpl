@@ -1,0 +1,15 @@
+{{- $name    := promptStringOnce . "name"  "Git user name" "Neria" -}}
+{{- $email   := promptStringOnce . "email" "Git email" -}}
+{{- $profile := promptChoiceOnce . "profile" "Machine profile" (list "personal" "work") -}}
+
+sourceDir = {{ (joinPath .chezmoi.homeDir "Documents/Personal/repositories/dotfiles") | quote }}
+encryption = "age"
+
+[data]
+    name    = {{ $name | quote }}
+    email   = {{ $email | quote }}
+    profile = {{ $profile | quote }}
+
+[age]
+    identity  = {{ (joinPath .chezmoi.homeDir ".config/chezmoi/key.txt") | quote }}
+    recipient = "age163ceztn3ymzd0fd9xd5zga7tn3040ptjz0kfnhwslkavhlvsh59s68jx50"

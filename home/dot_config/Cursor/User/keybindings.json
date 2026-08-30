@@ -1,0 +1,99 @@
+// Place your key bindings in this file to override the defaults
+[
+  {
+    "key": "alt+[",
+    "command": "workbench.action.previousWindow"
+  },
+  {
+      "key": "alt+]",
+    "command": "workbench.action.nextWindow"
+  },
+  {
+    "key": "cmd+i",
+    "command": "composerMode.agent"
+  },
+  {
+    "key": "alt+w",
+    "command": "editor.action.smartSelect.expand",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+shift+w",
+    "command": "editor.action.smartSelect.shrink",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+j",
+    "command": "editor.action.addSelectionToNextFindMatch",
+    "when": "editorFocus"
+  },
+  {
+    "key": "cmd+j",
+    "command": "editor.action.addSelectionToNextFindMatch",
+    "when": "editorFocus"
+  },
+  {
+    "key": "alt+x",
+    "command": "editor.action.clipboardCutAction"
+  },
+  {
+    "key": "alt+a",
+    "command": "editor.action.selectAll",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "alt+c",
+    "command": "editor.action.clipboardCopyAction",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "alt+v",
+    "command": "editor.action.clipboardPasteAction",
+    "when": "textInputFocus && !editorReadonly"
+  },
+  {
+    "key": "alt+x",
+    "command": "editor.action.clipboardCutAction",
+    "when": "textInputFocus && !editorReadonly"
+  },
+  {
+    "key": "alt+z",
+    "command": "undo",
+    "when": "textInputFocus && !editorReadonly"
+  },
+  {
+    "key": "alt+y",
+    "command": "redo",
+    "when": "textInputFocus && !editorReadonly"
+  },
+  {
+    "key": "alt+f",
+    "command": "actions.find",
+    "when": "editorFocus || editorIsOpen"
+  },
+  {
+    "key": "alt+s",
+    "command": "workbench.action.files.save"
+  },
+  {
+    "key": "cmd+p",
+    "command": "-editor.action.triggerParameterHints",
+    "when": "editorHasSignatureHelpProvider && editorTextFocus"
+  },
+  {
+    "key": "shift+enter",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "\\\r\n"
+    },
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+cmd+]",
+    "command": "workbench.action.showNextWindowTab"
+  },
+  {
+    "key": "ctrl+shift+cmd+[",
+    "command": "workbench.action.showPreviousWindowTab"
+  }
+]

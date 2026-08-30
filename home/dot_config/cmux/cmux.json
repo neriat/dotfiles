@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "notifications": {
+    "hooks": [
+      {
+        "id": "mute-claude-mem-observer-sessions",
+        "command": "jq -c 'def spam: ((.context.cwd // \"\") | test(\"\\\\.claude-mem/observer-sessions\")) or (([.notification.title, .notification.subtitle, .notification.body] | map(. // \"\") | join(\" \")) | test(\"observer-sessions\"; \"i\")); if spam then .effects.desktop=false | .effects.sound=false | .effects.paneFlash=false | .effects.markUnread=false | .effects.reorderWorkspace=false else . end'",
+        "timeoutSeconds": 5
+      }
+    ]
+  }
+}

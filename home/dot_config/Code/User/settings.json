@@ -1,0 +1,11 @@
+{
+    "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
+    "update.showReleaseNotes": false,
+    "editor.fontSize": 14,
+    "editor.tabSize": 2,
+    "workbench.colorTheme": "Dark+",
+    "editor.wordWrap": "on",
+    "files.autoSave": "afterDelay",
+    "editor.minimap.enabled": false,
+    "claudeCode.preferredLocation": "panel"
+}

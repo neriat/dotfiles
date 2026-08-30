@@ -1,0 +1,18 @@
+# Added by OrbStack: 'orb' SSH host for Linux machines
+# This only works if it's at the top of ssh_config (before any Host blocks).
+# This won't be added again if you remove it.
+Include ~/.orbstack/ssh/config
+
+
+Host openclaw
+    HostName openclaw-ntz-u71543.vm.elestio.app
+    User root
+    IdentityFile ~/.ssh/id_ed25519_openclaw
+    Port 22
+
+Host ntaws
+    Hostname ec2-54-209-234-58.compute-1.amazonaws.com
+    User ec2-user
+    IdentityFile ~/Documents/Personal/neria-aws-mac.pem
+    Port 22
+

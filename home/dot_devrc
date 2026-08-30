@@ -1,0 +1,126 @@
+#eval $(thefuck --alias)
+
+alias q=claude
+alias qw='claude --worktree'
+alias resume_app='killall -CONT -c '
+alias gipython='python $(which ipython_$(python -c "import sys; print(f\"{sys.version_info.major}{sys.version_info.minor}\")"))'
+alias rfff='ruff format'
+alias rc='ruff check --fix --show-fixes'
+alias rucf='ruff check --show-fixes --fix "$@" && ruff format "$@"'
+alias senv='set -a && source .env; set +a'
+alias gblru='git for-each-ref --sort=-committerdate refs/heads/ --format="%(refname:short)" | head -n 5'
+alias ggs='git log --oneline --graph --decorate origin/main HEAD'
+alias gll='git pull --rebase origin main'
+alias gcad='git commit --amend --no-edit'
+alias ssh_notebook='ssh -i ~/.ssh/notebook.pem ec2-user@10.50.92.43'
+alias ru='prun ruff format && ruff check --show-fixes --fix && mypy --config-file pyproject.toml .'
+gcbt() {
+  if [ -z "$1" ]; then
+    echo "Usage: gcbt <branch-suffix>"
+    return 1
+  fi
+  git checkout -b "BL-99999-$1" --no-track origin/main
+}
+fix_env_dots() {
+  local file="${1:-.env}"
+  sed -i '' -E 's/\.([^=]*=)/__\1/g; s/\.([^=]*=)/__\1/g;
+  s/\.([^=]*=)/__\1/g; s/\.([^=]*=)/__\1/g; s/\.([^=]*=)/__\1/g' "$file"
+}
+
+# Mac sleep utils
+alias sleep_disable='sudo pmset -a disablesleep 1'
+alias sleep_enable='sudo pmset -a disablesleep 0'
+alias sleep_status='pmset -g | grep -qE "SleepDisabled[[:space:]]+1" && echo "sleep: disabled" || echo "sleep: enabled"'
+
+
+# fix: https://stackoverflow.com/a/71298164
+export CFLAGS="-I$(brew --prefix openssl)/include"
+export LDFLAGS="-L$(brew --prefix openssl)/lib"
+
+# fix: docker.errors.DockerException: Error while fetching server API version: ('Connection aborted.', FileNotFoundError(2, 'No such file or directory'))
+export DOCKER_HOST="unix://${HOME}/.docker/run/docker.sock"
+
+
+# init pyenv (uses `zsh-pyenv-lazy` plugin)
+# export PYENV_ROOT="$HOME/.pyenv"
+# [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+# eval "$(pyenv init - zsh)"
+
+export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
+export PATH="/opt/homebrew/opt/postgresql/bin:$PATH"
+export PATH="/Users/neriatzidkani/.bun/bin:$PATH"
+. "$HOME/.local/bin/env"
+
+eval "$(direnv hook zsh)"
+alias pc="pre-commit run --all-files"
+
+# uv
+export UV_INDEX_STRATEGY=unsafe-first-match
+
+# fnm
+eval "$(fnm env)"
+
+# golang
+export PATH="$PATH:$HOME/go/bin"
+
+# go-task: opt in to remote Taskfile includes (shared-taskfile)
+export TASK_X_REMOTE_TASKFILES=1
+
+# homebrew
+export HOMEBREW_AUTO_UPDATE_SECS=86400
+
+# eza/brew completions: FPATH is now assembled in ~/.config/zsh/00-path.zsh,
+# which runs before oh-my-zsh performs the single compinit for the session.
+
+export LANG="en_US.UTF-8"
+
+
+# The next line updates PATH for the Google Cloud SDK.
+# if [ -f '/Users/neriatzidkani/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/neriatzidkani/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+# if [ -f '/Users/neriatzidkani/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/neriatzidkani/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+
+
+# airflow-blockaid's
+render_sql() {
+  if [[ $# -lt 2 ]]; then
+    echo "Usage: render_sql <sql_template> <json_file1> [<json_file2> ...]"
+    echo "  | e.g. "
+    echo "  | render_sql sql/dex_query_template.sql sql/jinja_mapping.json"
+    echo "  | or copy to clipboard:"
+    echo "  | render_sql sql/dex_query_template.sql sql/jinja_mapping.json | pbcopy"
+    return 1
+  fi
+
+  local sql_template="$1"
+  shift
+  jq -s \
+    --arg end "$(date -u +'%Y-%m-%dT%H:%M:%S+00:00')" \
+    --arg start "$(date -u -v-15M +'%Y-%m-%dT%H:%M:%S+00:00')" \
+    'def deep_merge(a; b):
+      a as $a | b as $b
+      | if ($a | type) == "object" and ($b | type) == "object"
+        then
+          reduce ($a + $b | keys_unsorted[]) as $key ({};
+            if ($b | has($key))
+            then .[$key] = deep_merge($a[$key]; $b[$key])
+            else .[$key] = $a[$key]
+            end)
+        else $b
+        end;
+    reduce .[] as $item ({}; deep_merge(.; $item)) 
+    | deep_merge(.; {data_interval_start: $start, data_interval_end: $end})' \
+    "$@" | \
+    jinja2 "$sql_template"
+}
+
+
+alias snowsql=/Applications/SnowSQL.app/Contents/MacOS/snowsql
+
+# Java
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"
+
+# Foundry (getfoundry.sh)
+export PATH="$PATH:$HOME/.foundry/bin"

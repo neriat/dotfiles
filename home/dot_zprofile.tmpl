@@ -1,0 +1,25 @@
+# Managed by chezmoi. Login shells only -- interactive config lives in ~/.zshrc.
+
+# Homebrew must come first: it puts brew itself on PATH for everything below.
+{{ if eq .chezmoi.os "darwin" -}}
+eval "$(/opt/homebrew/bin/brew shellenv)"
+{{- else -}}
+[[ -x /home/linuxbrew/.linuxbrew/bin/brew ]] && \
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+{{- end }}
+
+{{ if eq .chezmoi.os "darwin" -}}
+# JetBrains Toolbox CLI launchers
+export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
+
+# python.org framework build of Python 3.11
+[[ -d /Library/Frameworks/Python.framework/Versions/3.11/bin ]] && \
+  export PATH="/Library/Frameworks/Python.framework/Versions/3.11/bin:$PATH"
+
+# OrbStack: docker/kubectl integration
+source "$HOME/.orbstack/shell/init.zsh" 2>/dev/null || :
+
+# Snowflake SnowSQL
+[[ -d /Applications/SnowSQL.app/Contents/MacOS ]] && \
+  export PATH="/Applications/SnowSQL.app/Contents/MacOS:$PATH"
+{{- end }}

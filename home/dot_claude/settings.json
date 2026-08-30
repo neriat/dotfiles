@@ -1,0 +1,139 @@
+{
+  "agentPushNotifEnabled": true,
+  "cleanupPeriodDays": 99999,
+  "disabledMcpjsonServers": [
+    "filesystem",
+    "jetbrains",
+    "claude.ai Ahrefs",
+    "claude.ai Zapier",
+    "claude.ai Pylon",
+    "claude.ai Google Calendar",
+    "claude.ai Figma"
+  ],
+  "editorMode": "normal",
+  "effortLevel": "high",
+  "enableWorkflows": false,
+  "enabledPlugins": {
+    "academic-research-skills@academic-research-skills": true,
+    "cctop@cctop": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "claude-mem@thedotmack": true,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "github@claude-plugins-official": false,
+    "gopls-lsp@claude-plugins-official": true,
+    "playground@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "pr-review-toolkit@claude-code-plugins": false,
+    "pyright-lsp@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true,
+    "token-optimizer@alexgreensh-token-optimizer": false
+  },
+  "extraKnownMarketplaces": {
+    "academic-research-skills": {
+      "source": {
+        "repo": "Imbad0202/academic-research-skills",
+        "source": "github"
+      }
+    },
+    "alexgreensh-token-optimizer": {
+      "source": {
+        "repo": "alexgreensh/token-optimizer",
+        "source": "github"
+      }
+    },
+    "cctop": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/DeanLa/cctop.git"
+      }
+    },
+    "thedotmack": {
+      "source": {
+        "repo": "thedotmack/claude-mem",
+        "source": "github"
+      }
+    }
+  },
+  "hooks": {
+    "InstructionsLoaded": [
+      {
+        "hooks": [
+          {
+            "command": "/Users/neriatzidkani/.claude/hooks/boost-observe-claude.sh",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "/Users/neriatzidkani/.claude/hooks/boost-hook-claude.sh",
+            "type": "command"
+          }
+        ],
+        "matcher": "mcp__.*"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "/Users/neriatzidkani/.claude/hooks/boost-hook-claude.sh",
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash|PowerShell|Read"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "/Users/neriatzidkani/.claude/hooks/boost-sync.sh",
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "command": "/Users/neriatzidkani/.claude/hooks/boost-observe-claude.sh",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "command": "/Users/neriatzidkani/.claude/hooks/boost-observe-claude.sh",
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  },
+  "model": "opus[1m]",
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "skipAutoPermissionPrompt": true,
+  "statusLine": {
+    "command": "node '/Users/neriatzidkani/.claude/plugins/cache/alexgreensh-token-optimizer/token-optimizer/5.8.3/skills/token-optimizer/scripts/statusline.js'",
+    "type": "command"
+  },
+  "switchModelsOnFlag": true,
+  "tui": "fullscreen",
+  "workflowKeywordTriggerEnabled": false,
+  "worktree": {
+    "baseRef": "fresh"
+  }
+}
