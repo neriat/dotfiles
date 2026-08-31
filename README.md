@@ -62,6 +62,39 @@ chezmoi cd                        # shell into the source dir to commit/push
 chezmoi --refresh-externals apply # force-refresh oh-my-zsh & plugins
 ```
 
+## Apps whose state cannot be reproduced
+
+Four apps install cleanly but carry state the repo cannot carry for you.
+
+**Cloudflare WARP.** Every setting `warp-cli settings` reports is marked
+`(network policy)` or `(override)` -- it is pushed from the Cloudflare Zero Trust
+dashboard, not stored locally. `/Library/Application Support/Cloudflare` is
+root-owned device registration specific to one machine. The only reproducible
+piece is enrolment, which script 28 runs for you:
+
+```sh
+warp-cli teams-enroll blockaid     # then finish sign-in in the browser
+```
+
+The script exits early if the device is already registered, so it never disturbs
+a working VPN.
+
+**Okta Verify.** Enrolment is a device-bound key; there is nothing exportable.
+Re-enrol by hand from your Okta dashboard on a new machine.
+
+**Postman.** Deliberately untracked. `Postman_Config` is 359 bytes of
+server-driven feature flags and the rest of the 596 MB is Electron cache -- no
+tokens, no user settings. Collections and environments live in your Postman
+account and sync on sign-in.
+
+**AltTab (paid tier).** `com.lwouis.alt-tab-macos.license` stores only
+`customerEmail`, a validation timestamp and a cached `lastValidationResult` --
+**no licence key exists locally**, and there is no Keychain item either.
+Validation is server-side against the email. The domain is tracked
+age-encrypted so a new machine knows which email to enter; activation still
+happens online. The timestamps are stripped at capture so the encrypted blob
+does not churn.
+
 ## Rust
 
 `rustup` is installed from <https://sh.rustup.rs> by
@@ -171,7 +204,7 @@ TCC privacy grants -- Accessibility, Screen Recording, Input Monitoring -- are
 SIP-protected and deliberately cannot be exported. On a new Mac, re-grant them by
 hand or these apps will silently do nothing:
 
-- **Accessibility:** Rectangle, Amethyst, AltTab, Maccy, MiddleClick, Vorssaint
+- **Accessibility:** Rectangle, Amethyst, AltTab, Maccy, MiddleClick, Vorssaint, Parsec
 - **Screen Recording:** Shottr, AltTab
 - **Input Monitoring:** MiddleClick, Karabiner-Elements
 - **Full Disk Access:** any terminal you run `chezmoi apply` from
@@ -193,12 +226,23 @@ hand or these apps will silently do nothing:
 
 ## Machine profiles
 
-`profile` is asked once at init and gates exactly one thing: `.blockaidrc`
-(work registry credentials, `GEMINI_API_KEY`, AWS SSO helpers) applies only when
-`profile = "work"`. Everything else is personal and applies on every machine.
+`profile` is asked once at init. **Normal is the base set that applies to every
+machine; work is purely additive** -- nothing is subtracted on a personal machine,
+work simply adds more.
 
-OS splitting is automatic via `.chezmoiignore`: `Library/**`, cmux, karabiner and
-zellij are skipped off macOS.
+Two things are work-gated:
+
+| Gated | Contains |
+|---|---|
+| `.blockaidrc` | registry credentials, `GEMINI_API_KEY`, AWS SSO helpers |
+| `Brewfile.work` | Cloudflare WARP, Okta Verify, HP Easy Scan |
+
+Plus `run_onchange_after_28-warp-enroll.sh.tmpl`, which renders to nothing at all
+off a work machine.
+
+Everything else -- including all the personal apps in `Brewfile.darwin` -- applies
+everywhere. OS splitting is separate and automatic via `.chezmoiignore`:
+`Library/**`, cmux, karabiner, zellij and macos-defaults are skipped off macOS.
 
 ## Deliberately not tracked
 

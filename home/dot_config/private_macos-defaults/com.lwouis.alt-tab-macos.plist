@@ -38,19 +38,6 @@
 	sAK2ArwCvgLHAs4C6QLuAvkC/QMIAxcDHAM0AzgDUANiA2cDdgN6AAAAAAAAAgEAAAAA
 	AAAAagAAAAAAAAAAAAAAAAAAA4I=
 	</data>
-	<key>MSAppCenterSessionIdHistory</key>
-	<data>
-	YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMS
-	AAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGnCwwSGBwiJ1UkbnVsbNINDg8R
-	Wk5TLm9iamVjdHNWJGNsYXNzoRCAAoAG0xMUDhUWF1x0aW1lc3RhbXBLZXlcc2Vzc2lv
-	bklkS2V5gAOAAIAF0hkOGhtXTlMudGltZSNByBjbyT6XyIAE0h0eHyBaJGNsYXNzbmFt
-	ZVgkY2xhc3Nlc1ZOU0RhdGWiHyFYTlNPYmplY3TSHR4jJF8QFk1TQUNTZXNzaW9uSGlz
-	dG9yeUluZm+jJSYhXxAWTVNBQ1Nlc3Npb25IaXN0b3J5SW5mb18QD01TQUNIaXN0b3J5
-	SW5mb9IdHigpXk5TTXV0YWJsZUFycmF5oygqIVdOU0FycmF5AAgAEQAaACQAKQAyADcA
-	SQBMAFEAUwBbAGEAZgBxAHgAegB8AH4AhQCSAJ8AoQCjAKUAqgCyALsAvQDCAM0A1gDd
-	AOAA6QDuAQcBCwEkATYBOwFKAU4AAAAAAAACAQAAAAAAAAArAAAAAAAAAAAAAAAAAAAB
-	Vg==
-	</data>
 	<key>MSAppCenterUserIdHistory</key>
 	<data>
 	YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMS
@@ -69,12 +56,8 @@
 	<true/>
 	<key>SUHasLaunchedBefore</key>
 	<true/>
-	<key>SULastCheckTime</key>
-	<date>2026-08-30T07:56:57Z</date>
 	<key>SUUpdateGroupIdentifier</key>
 	<integer>1428911449</integer>
-	<key>SUUpdateRelaunchingMarker</key>
-	<true/>
 	<key>alignThumbnails</key>
 	<string>1</string>
 	<key>appearanceSize</key>
@@ -201,8 +184,6 @@
 	<integer>1</integer>
 	<key>startAtLogin</key>
 	<string>true</string>
-	<key>trialStartDate</key>
-	<real>1893448832.0</real>
 	<key>updatePolicy</key>
 	<string>1</string>
 	<key>windowDisplayDelay</key>

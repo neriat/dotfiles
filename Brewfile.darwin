@@ -26,6 +26,8 @@ cask "rectangle"
 cask "lunar"                # external-display brightness
 cask "betterdisplay"
 cask "shottr"               # screenshot/annotation
+cask "alt-tab"              # window switcher; shortcuts + licence in macos-defaults
+cask "macs-fan-control"
 cask "maccy"
 cask "middleclick"
 cask "notunes"
@@ -42,7 +44,8 @@ cask "cursor"               # settings tracked at ~/.config/Cursor/User
 cask "visual-studio-code"   # settings tracked at ~/.config/Code/User
 cask "claude"               # Claude desktop app (the CLI is installed by script 30)
 cask "obsidian"
-cask "postman"
+cask "postman"              # collections live in the Postman cloud account, not on disk
+cask "stirling-pdf"
 cask "gitkraken"
 cask "dbeaver-community"
 cask "pgadmin4"
@@ -68,10 +71,13 @@ cask "whatsapp"
 # --- media ---
 cask "iina"
 cask "vlc"
+cask "spotify"
+
+# --- remote access ---
+cask "parsec"
 
 # --- Mac App Store ---
 mas "1Password for Safari", id: 1569813296
 mas "OneLogin for Safari",  id: 1475824389
 mas "Numbers",              id: 361304891
 mas "Xcode",                id: 497799835
-mas "HP Easy Scan",         id: 967004861

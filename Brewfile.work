@@ -1,0 +1,18 @@
+# Work-machine extras. Applied in addition to Brewfile and Brewfile.darwin when
+# the machine was initialised with profile = "work".
+#
+# Profile semantics: "normal" is the base set that applies to every machine;
+# work is purely additive. Nothing here is removed from a personal machine --
+# it is simply never installed there.
+#
+# Everything below is macOS-only, so run_onchange_after_20-brew-bundle.sh.tmpl
+# gates this file on darwin AND work. A Linux work machine would need its own
+# section here plus a matching guard in that script.
+
+cask "cloudflare-warp"      # Zero Trust client; warp-cli ships inside the cask.
+                            # Enrollment is handled by script 28 (org: blockaid).
+cask "okta-verify"          # Device enrolment is Secure-Enclave bound and cannot
+                            # be exported -- re-enrol by hand on a new machine.
+
+# --- Mac App Store ---
+mas "HP Easy Scan", id: 967004861

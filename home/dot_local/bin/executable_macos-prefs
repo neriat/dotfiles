@@ -17,7 +17,9 @@ SNAP="${TMPDIR:-/tmp}/macos-prefs-snapshot"
 # Keys stripped on capture: window geometry and other per-session churn that
 # would otherwise make every capture a dirty diff.
 VOLATILE_PREFIXES='NSStatusItem NSWindow NSToolbar NSNavPanel NSSplitView'
-VOLATILE_EXACT='recent-apps mod-count region lastUsed lastCheck LastUsed'
+VOLATILE_EXACT='recent-apps mod-count region lastUsed lastCheck LastUsed
+SULastCheckTime SUUpdateRelaunchingMarker MSAppCenterSessionIdHistory
+lastValidation trialStartDate'
 
 _domains() {
     defaults domains | tr ',' '\n' | sed 's/^ *//' | grep -v '^$'

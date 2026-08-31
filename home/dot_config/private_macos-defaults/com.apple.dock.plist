@@ -397,7 +397,7 @@
 	<key>tilesize</key>
 	<integer>32</integer>
 	<key>trash-full</key>
-	<false/>
+	<true/>
 	<key>version</key>
 	<integer>1</integer>
 	<key>wvous-br-corner</key>

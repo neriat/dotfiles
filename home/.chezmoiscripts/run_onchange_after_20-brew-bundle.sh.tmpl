@@ -8,6 +8,9 @@
 {{- if eq .chezmoi.os "darwin" }}
 #   Brewfile.darwin hash: {{ include "../Brewfile.darwin" | sha256sum }}
 {{- end }}
+{{- if and (eq .chezmoi.os "darwin") (eq .profile "work") }}
+#   Brewfile.work   hash: {{ include "../Brewfile.work" | sha256sum }}
+{{- end }}
 set -eu
 
 SRC="{{ .chezmoi.sourceDir }}/.."
@@ -33,4 +36,8 @@ brew bundle --file="$SRC/Brewfile" --no-upgrade
 {{ if eq .chezmoi.os "darwin" }}
 echo "==> brew bundle: Brewfile.darwin"
 brew bundle --file="$SRC/Brewfile.darwin" --no-upgrade
+{{- end }}
+{{ if and (eq .chezmoi.os "darwin") (eq .profile "work") }}
+echo "==> brew bundle: Brewfile.work (profile=work)"
+brew bundle --file="$SRC/Brewfile.work" --no-upgrade
 {{- end }}

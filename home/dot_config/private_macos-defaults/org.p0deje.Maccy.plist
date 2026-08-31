@@ -31,8 +31,6 @@
 	<true/>
 	<key>SUHasLaunchedBefore</key>
 	<true/>
-	<key>SULastCheckTime</key>
-	<date>2026-07-29T14:30:35Z</date>
 	<key>SUUpdateGroupIdentifier</key>
 	<integer>1708266617</integer>
 	<key>clearOnQuit</key>
