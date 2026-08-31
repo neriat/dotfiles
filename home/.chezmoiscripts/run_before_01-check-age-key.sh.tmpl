@@ -1,0 +1,84 @@
+{{- if eq (.chezmoi.config.encryption | default "") "age" -}}
+#!/bin/sh
+# Preflight: make sure the age identity is present and is the RIGHT key, before
+# chezmoi tries to decrypt anything.
+#
+# Without this, a missing key produces only:
+#     age: error: reading "...": failed to open file: no such file or directory
+# which says nothing about what to do about it.
+#
+# The identity file is a CACHE. The authoritative copy lives wherever you chose
+# to keep it (see README) -- this repo never stores it and never will.
+#
+# Plain run_before_ (not run_onchange_) so it checks on every single apply: the
+# key can go missing at any time, not just when this script changes.
+set -eu
+
+IDENTITY="{{ .chezmoi.config.age.identity }}"
+EXPECTED="{{ .chezmoi.config.age.recipient }}"
+
+instructions() {
+    cat >&2 <<MSG
+
+  ┌─ age identity missing ────────────────────────────────────────────────┐
+    chezmoi cannot decrypt this repo without it.
+
+    Expected at:  $IDENTITY
+    Public key:   $EXPECTED
+
+    Restore your backed-up private key to that path, then:
+        chmod 600 "$IDENTITY"
+
+    The file must start with:  AGE-SECRET-KEY-1...
+    A key whose public half is not the value above will NOT work.
+  └───────────────────────────────────────────────────────────────────────┘
+
+MSG
+}
+
+while [ ! -f "$IDENTITY" ]; do
+    instructions
+    # Probe /dev/tty with a real write: it can exist and pass -w while still
+    # being unusable (e.g. under a CI runner or a detached process).
+    if { : > /dev/tty; } 2>/dev/null; then
+        printf '  Press Enter once the key is in place (Ctrl-C to abort): ' > /dev/tty
+        read -r _ < /dev/tty || exit 1
+    else
+        echo "  (non-interactive run: aborting)" >&2
+        exit 1
+    fi
+done
+
+# Verify it is the right key, not merely a key. `chezmoi age-keygen` is used in
+# preference to `age-keygen` because chezmoi is guaranteed present here, whereas
+# the age binary is not installed until Brewfile processing later in the apply.
+if command -v chezmoi >/dev/null 2>&1; then
+    ACTUAL=$(chezmoi age-keygen -y "$IDENTITY" 2>/dev/null || true)
+elif command -v age-keygen >/dev/null 2>&1; then
+    ACTUAL=$(age-keygen -y "$IDENTITY" 2>/dev/null || true)
+else
+    ACTUAL=""   # cannot verify; presence check above already passed
+fi
+
+if [ -n "$ACTUAL" ] && [ "$ACTUAL" != "$EXPECTED" ]; then
+    cat >&2 <<MSG
+
+  ┌─ WRONG age identity ──────────────────────────────────────────────────┐
+    The key at $IDENTITY is valid but is not this repo's key.
+
+      it decrypts for: $ACTUAL
+      repo encrypts to: $EXPECTED
+
+    Replace it with the correct backup, or if you intend to rotate keys see
+    "Rotating the age key" in the README.
+  └───────────────────────────────────────────────────────────────────────┘
+
+MSG
+    exit 1
+fi
+
+if [ "$(stat -f '%Lp' "$IDENTITY" 2>/dev/null || echo 600)" != "600" ]; then
+    echo "==> tightening permissions on $IDENTITY to 600" >&2
+    chmod 600 "$IDENTITY"
+fi
+{{- end }}

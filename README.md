@@ -8,14 +8,19 @@ Secrets are [age](https://age-encryption.org)-encrypted in-repo.
 
 ## Bootstrap a new machine
 
-1. **Restore the age key first.** It is in 1Password (item: *chezmoi age key*).
-   Without it, `apply` aborts on the encrypted files.
+1. **Restore the age key first.** Without it, `apply` stops on the encrypted files.
 
    ```sh
    mkdir -p ~/.config/chezmoi
-   op read "op://Private/chezmoi age key/notesPlain" > ~/.config/chezmoi/key.txt   # or paste it
+   # restore your backed-up private key to this path, however you keep it
    chmod 600 ~/.config/chezmoi/key.txt
    ```
+
+   `run_before_01-check-age-key.sh.tmpl` verifies the key before anything is
+   decrypted: if it is missing it prints the expected path and public key and
+   waits (or aborts when non-interactive), and if the key is valid but belongs to
+   a different identity it refuses with both public keys shown. You will not get
+   a bare `age: error: reading ...` any more.
 
 2. **Run chezmoi.** It installs itself, clones this repo, and applies everything.
 
@@ -61,6 +66,19 @@ chezmoi apply                     # write changes to $HOME
 chezmoi cd                        # shell into the source dir to commit/push
 chezmoi --refresh-externals apply # force-refresh oh-my-zsh & plugins
 ```
+
+**`chezmoi verify` exits 1 even when nothing has drifted.** The age-key preflight
+is a plain `run_before_` script, so it is due to run on every apply and chezmoi
+counts that as pending work. To check *file* state, exclude scripts:
+
+```sh
+chezmoi verify --exclude=scripts   # exit 0 when files match
+chezmoi diff   --exclude=scripts   # empty when files match
+```
+
+The alternative — making the guard `run_onchange_` — would silence this but only
+check the key on a fresh machine, not after you delete the local cache, which is
+the case that matters most.
 
 ## Apps whose state cannot be reproduced
 
@@ -309,6 +327,28 @@ git config --local --add credential.https://github.com.helper \
 
 This lives in `.git/config`, which is not tracked, so re-apply it after a fresh
 clone on another machine.
+
+## The age key is a cache
+
+`~/.config/chezmoi/key.txt` is **a cache, not the record.** The authoritative
+copy lives wherever you keep your backups; this repo has never contained it and
+`key.txt` is in `.gitignore` for good measure.
+
+That means the on-disk copy is disposable: delete it, restore it, move the
+machine — the only requirement is that it is back at the configured path before
+the next `apply`, and the preflight script tells you exactly what to put where.
+
+Its public half is committed (`age.recipient` in `.chezmoi.toml.tmpl`), which is
+what makes the mismatch check possible. Publishing a recipient is safe by design.
+
+**There is exactly one thing that cannot be recovered from a backup of this
+repo: the private key.** Lose every copy and the 8 encrypted blobs
+(`.blockaidrc`, three SSH keys, four licence domains) are gone for good. Keep at
+least two independent copies.
+
+If you want to remove the local copy entirely and be prompted for a passphrase
+instead, chezmoi supports `age.passphrase = true` — that requires re-encrypting
+every blob, so it is a deliberate migration rather than a config flip.
 
 ## Rotating the age key
 
