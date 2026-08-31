@@ -13,7 +13,6 @@ brew "leaperone/smctl/smctl"
 
 # --- terminals & shell UI ---
 cask "ghostty"              # primary terminal; config is cross-platform
-cask "alacritty"
 cask "warp"
 cask "cmux"                 # terminal multiplexer; config in ~/.config/cmux
 cask "font-hack-nerd-font"  # powerlevel10k glyphs
@@ -47,7 +46,6 @@ cask "obsidian"
 cask "postman"              # collections live in the Postman cloud account, not on disk
 cask "stirling-pdf"
 cask "gitkraken"
-cask "dbeaver-community"
 cask "pgadmin4"
 cask "marta"
 cask "codex"
