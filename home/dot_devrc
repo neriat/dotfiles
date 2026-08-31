@@ -38,7 +38,8 @@ export DOCKER_HOST="unix://${HOME}/.docker/run/docker.sock"
 # [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 # eval "$(pyenv init - zsh)"
 
-export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
+# openjdk@17 removed from PATH: jenv shims cover every binary it provided,
+# and this line ran after ~/.config/zsh/20-jenv.zsh, shadowing the shims.
 export PATH="/opt/homebrew/opt/postgresql/bin:$PATH"
 export PATH="/Users/neriatzidkani/.bun/bin:$PATH"
 source "$HOME/.local/bin/env"
@@ -62,9 +63,7 @@ export LANG="en_US.UTF-8"
 
 alias snowsql=/Applications/SnowSQL.app/Contents/MacOS/snowsql
 
-# Java
-export PATH="$HOME/.jenv/bin:$PATH"
-eval "$(jenv init -)"
+# Java: see ~/.config/zsh/20-jenv.zsh (lazy jenv, no per-prompt fork).
 
 # Foundry (getfoundry.sh)
 export PATH="$PATH:$HOME/.foundry/bin"
