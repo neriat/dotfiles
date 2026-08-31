@@ -16,11 +16,8 @@ Secrets are [age](https://age-encryption.org)-encrypted in-repo.
    chmod 600 ~/.config/chezmoi/key.txt
    ```
 
-   `run_before_01-check-age-key.sh.tmpl` verifies the key before anything is
-   decrypted: if it is missing it prints the expected path and public key and
-   waits (or aborts when non-interactive), and if the key is valid but belongs to
-   a different identity it refuses with both public keys shown. You will not get
-   a bare `age: error: reading ...` any more.
+   You do not have to do this first, though — see *Applying without the key*
+   below. Without it, everything except the encrypted files still applies.
 
 2. **Run chezmoi.** It installs itself, clones this repo, and applies everything.
 
@@ -327,6 +324,42 @@ git config --local --add credential.https://github.com.helper \
 
 This lives in `.git/config`, which is not tracked, so re-apply it after a fresh
 clone on another machine.
+
+## Applying without the key
+
+`chezmoi apply` works with a missing or wrong age key. The encrypted targets are
+skipped, everything else applies, and a warning lists exactly what was left out.
+
+This is not chezmoi's default: it **aborts the entire run** on the first file it
+cannot decrypt — one error, the remaining encrypted files never attempted, and no
+non-encrypted file applied either. Two pieces change that:
+
+- **`.chezmoiignore`** removes the encrypted targets from the run when the key
+  cannot decrypt. The list is derived from the `encrypted_*` source names, so a
+  newly added encrypted file is covered automatically.
+- **`run_before_01-check-age-key.sh.tmpl`** prints the warning. It always exits 0
+  and never blocks.
+
+Two conditions are detected, deliberately by different means:
+
+| Condition | Detected with | Why |
+|---|---|---|
+| Key file absent | `stat` | Needs nothing installed |
+| Key present but a *different* identity | `age-keygen -y` | Only when that binary exists |
+
+The asymmetry matters. On a fresh machine the key is restored *before* Homebrew
+installs `age`, so an `age-keygen` probe returns empty for a perfectly good key.
+Using it to decide presence would silently withhold your SSH keys. Presence is
+therefore always decided by `stat` alone.
+
+**Ignoring is not removing.** Already-decrypted copies on disk are untouched, so a
+machine that loses its key keeps its working `~/.ssh/id_ed25519`.
+
+The manual equivalent, if you ever want it explicitly:
+
+```sh
+chezmoi apply --exclude=encrypted
+```
 
 ## The age key is a cache
 
