@@ -1,0 +1,26 @@
+{{- if and (eq .chezmoi.os "darwin") (eq .profile "work") -}}
+#!/bin/sh
+# Enrol this device in the Cloudflare Zero Trust team.
+#
+# There is nothing else about WARP worth tracking: every setting reported by
+# `warp-cli settings` is marked (network policy) or (override), i.e. pushed from
+# the Cloudflare dashboard, and the local state in
+# /Library/Application Support/Cloudflare is root-owned device registration
+# specific to this machine. Enrolment is the whole reproducible part.
+set -eu
+
+WARP_CLI=/usr/local/bin/warp-cli   # ships inside the cloudflare-warp cask
+[ -x "$WARP_CLI" ] || { echo "==> warp-cli not present yet; skipping enrolment"; exit 0; }
+
+if "$WARP_CLI" --accept-tos registration show >/dev/null 2>&1; then
+    exit 0    # already registered; do not touch a working VPN
+fi
+
+echo "==> Enrolling this device in the 'blockaid' Cloudflare Zero Trust team"
+"$WARP_CLI" --accept-tos teams-enroll blockaid || {
+    echo "    enrolment command failed -- run it by hand:" >&2
+    echo "      warp-cli teams-enroll blockaid" >&2
+    exit 0    # a VPN enrolment failure must not abort the whole apply
+}
+echo "    Finish the sign-in in the browser window WARP just opened."
+{{- end }}
