@@ -168,5 +168,6 @@
   "[go]": {
     "editor.defaultFormatter": "golang.go"
   },
-  "go.toolsManagement.autoUpdate": true
+  "go.toolsManagement.autoUpdate": true,
+  "extensions.installCooldownHours": 7
 }
