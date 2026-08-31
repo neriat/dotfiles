@@ -4,6 +4,47 @@ README.md
 # Per-machine escape hatch: sourced by ~/.zshrc if present, never tracked
 .config/zsh/99-local.zsh
 
+# --- Graceful degradation when the age identity cannot decrypt -----------------
+#
+# chezmoi aborts the ENTIRE apply on the first file it cannot decrypt -- it does
+# not skip and continue. So when the key is unusable we ignore the encrypted
+# targets outright, letting everything else apply. Ignoring is not removing:
+# any already-decrypted copies on disk are left untouched.
+#
+# The two conditions are detected differently on purpose:
+#   * absence      -> `stat`, which needs nothing installed.
+#   * wrong key    -> `age-keygen -y`, but ONLY when that binary exists.
+# Never use the age-keygen probe to decide presence: on a fresh machine the key
+# is restored before Homebrew installs `age`, so the probe returns empty for a
+# perfectly good key and would silently withhold the SSH keys.
+#
+# run_before_01-check-age-key.sh.tmpl repeats this decision in shell to print
+# the warning; keep the two in step.
+{{- $id := .chezmoi.config.age.identity -}}
+{{- $skipEncrypted := false -}}
+{{- if not (stat $id) -}}
+{{-   $skipEncrypted = true -}}
+{{- else -}}
+{{-   $probe := output "sh" "-c" (printf "command -v age-keygen >/dev/null 2>&1 && age-keygen -y %s 2>/dev/null || true" $id) | trim -}}
+{{-   if and (ne $probe "") (ne $probe .chezmoi.config.age.recipient) -}}
+{{-     $skipEncrypted = true -}}
+{{-   end -}}
+{{- end }}
+{{ if $skipEncrypted }}
+{{- /* Derived from the encrypted_* source names, so a new encrypted file is
+       covered automatically. Verified equal to `chezmoi managed --include=encrypted`. */ -}}
+{{- range (glob (joinPath $.chezmoi.sourceDir "**/encrypted_*")) }}
+{{- $rel := trimSuffix ".age" (trimPrefix (printf "%s/" $.chezmoi.sourceDir) .) -}}
+{{- $out := list -}}
+{{- range (splitList "/" $rel) -}}
+{{-   $s := trimPrefix "private_" (trimPrefix "encrypted_" .) -}}
+{{-   if hasPrefix "dot_" $s }}{{ $s = printf ".%s" (trimPrefix "dot_" $s) }}{{ end -}}
+{{-   $out = append $out $s -}}
+{{- end }}
+{{ join "/" $out }}
+{{- end }}
+{{ end }}
+
 {{ if ne .chezmoi.os "darwin" }}
 # --- macOS-only ---
 Library/**
