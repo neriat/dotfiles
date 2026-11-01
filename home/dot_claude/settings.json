@@ -1,5 +1,39 @@
 {
   "agentPushNotifEnabled": true,
+  "autoMode": {
+    "environment": [
+      "### Org-wide",
+      "**Organization**: RectangelHelp (GitHub org hosting this repo's remote) — no broader org config found",
+      "**Cloud provider(s)**: AWS (account 550337883379 referenced as `prod` in repo skill docs; ECR registry 714635931432.dkr.ecr.us-east-1.amazonaws.com seen in config)",
+      "**Repository visibility**: Private (confirmed via gh) — github.com/RectangelHelp/exploit-detection",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: None configured — CI secret names referenced (not values): ANTHROPIC_API_KEY, GITHUB_TOKEN; local `.env`/`.env.*`/`*.key`/`notebooks/snowflake.key` patterns are gitignored, treat as sensitive local files",
+      "**Default / protected branches**: Default branch `main`; rulesets active (`Branch Naming Convention`, `Default Branch Protection`, `Repository Protection`) — many feature branches additionally listed as protected",
+      "**CI/CD deploy targets**: None configured",
+      "**Network posture**: None configured",
+      "**Host containment**: None configured — assume ordinary developer machine with open internet",
+      "**Source control**: The trusted repo (RectangelHelp/exploit-detection) and its origin remote only",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: exploit-detection-api.exploit-detection.prod.blockaid.io (28×), txch48scdf.execute-api.us-east-1.amazonaws.com (15×), sqs.us-east-1.amazonaws.com (5×) — hosts contacted repeatedly in this project's transcripts",
+      "**Internal package registry**: boost.jfrog.com (seen 2× in this project's transcripts)",
+      "**Sensitive data locations \u0026 audiences**: `.env`, `.env copy`, `.env.bk`, `notebooks/snowflake.key`, `*.key` files; `scripts/rds_iam_connect.sh`; `jobs/exploit-detection-feature-mismatch-check/feature_mismatch_check/prod_rows.py` and its test; share only with audiences cleared at the [named+specifics] bar",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: AWS account 550337883379 (`prod` profile/account, us-east-1) and any SQS queue, namespace, or host containing `prod`/`production` as a whole segment (e.g. `*-prod-*`, `exploit-detection-classify-tx-worker-prod-deadletter.fifo`)",
+      "**Protected deployment namespaces / environments**: `prod` Kubernetes namespace and `terraform/environments/prod/*`; also `terraform/environments/base/*` and `terraform/environments/stage/*` as IaC-managed environments for this repo",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, node-pool resources; anything under `terraform/environments/prod/` or tagged/named with `prod`/`production` as a whole segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development (exploit detection research, feature pipeline, DLQ/incident investigation tooling)",
+      "**Trusted repo**: /Users/neriatzidkani/Documents/repositories/RectangelHelp/exploit-detection (origin: https://github.com/RectangelHelp/exploit-detection.git), private",
+      "**Org-specific CLIs**: clisso (OneLogin/AWS SSO login helper), rtk (shell wrapper that proxies `aws` calls — use `rtk proxy aws ...` when `aws` returns a schema instead of values), poetry (18× in this project), uv",
+      "**Routine under this repo's `.claude/skills/` prefix**: DLQ redrive, feature-version-check, and time-invariance-check skills operate read-mostly against AWS prod SQS and this repo's source — routine for this project only"
+    ],
+    "soft_deny": [
+      "$defaults",
+      "Bash(AWS_PROFILE=prod aws sqs start-message-move-task:*) in exploit-detection — prod SQS DLQ redrive is a production data-flow mutation, confirm before running outside the documented skill flow",
+      "Bash(aws sqs delete-message:*) in exploit-detection — irreversible prod queue deletion"
+    ]
+  },
   "cleanupPeriodDays": 99999,
   "disabledMcpjsonServers": [
     "filesystem",
@@ -78,10 +112,10 @@
             "type": "command"
           }
         ],
-        "matcher": "mcp__.*"
+        "matcher": "mcp__.*|WebFetch|Bash"
       }
     ],
-    "PreToolUse": [
+    "PostToolUseFailure": [
       {
         "hooks": [
           {
@@ -89,7 +123,53 @@
             "type": "command"
           }
         ],
-        "matcher": "Bash|PowerShell|Read"
+        "matcher": "Read"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "rtk hook claude",
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash"
+      },
+      {
+        "hooks": [
+          {
+            "command": "/Users/neriatzidkani/.claude/hooks/boost-hook-claude.sh",
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash|PowerShell|Read|mcp__boost-graph__.*"
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "/Users/neriatzidkani/Documents/repositories/personal/cc-top-bar/build/ClaudeBar.app/Contents/Resources/claudebar-hook",
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "command": "/Users/neriatzidkani/Documents/repositories/personal/cc-top-bar/build/ClaudeBar.app/Contents/Resources/claudebar-hook",
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "command": "/Users/neriatzidkani/.claude/hooks/boost-observe-claude.sh",
+            "type": "command"
+          }
+        ]
       }
     ],
     "Stop": [
@@ -122,6 +202,11 @@
     ]
   },
   "model": "opus[1m]",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    }
+  },
   "permissions": {
     "defaultMode": "auto"
   },

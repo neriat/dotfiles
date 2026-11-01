@@ -19,4 +19,7 @@ export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 # Snowflake SnowSQL
 [[ -d /Applications/SnowSQL.app/Contents/MacOS ]] && \
   export PATH="/Applications/SnowSQL.app/Contents/MacOS:$PATH"
+
+# Docker Desktop CLI tools
+[[ -d "$HOME/.docker/bin" ]] && export PATH="$PATH:$HOME/.docker/bin"
 {{- end }}

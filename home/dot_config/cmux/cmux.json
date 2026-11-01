@@ -8,5 +8,10 @@
         "timeoutSeconds": 5
       }
     ]
+  },
+  "sleepyMode": {
+    "theme": "mono",
+    "mascot": "ghost",
+    "glow": "black"
   }
 }

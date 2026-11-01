@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 BOOST_EXE="${HOME}/.local/bin/boost"
 export PATH="$PATH:${HOME}/.local/bin"
-# boost-hook-version: v0.13.3
-# boost-skill-version: v0.13.3
+# boost-hook-version: v0.16.11
+# boost-skill-version: v0.16.11
 
 _boost_find_jq() {
   if command -v jq &>/dev/null; then
@@ -102,14 +102,13 @@ _boost_write_hook_meta_file() {
 }
 _boost_wrap_rewritten() {
   local meta_json="$1" body="$2"
-  local meta_file meta_file_sq bindir bindir_q env_exports="" key val val_sq run_body
+  local meta_file meta_file_sq boost_exe_sq env_exports="" key val val_sq upstream tail boost_side wrapped
   meta_file=$(_boost_write_hook_meta_file "$meta_json")
   if [ -z "$meta_file" ]; then
     return 1
   fi
   meta_file_sq="'$(_boost_bash_sq "$meta_file")'"
-  bindir=$(_boost_path_for_wrap "$(dirname "$BOOST_EXE")")
-  bindir_q="'$(_boost_bash_sq "$bindir")'"
+  boost_exe_sq="'$(_boost_bash_sq "$BOOST_EXE")'"
   for key in $_boost_hook_env_keys; do
     val="${!key:-}"
     if [ -n "$val" ]; then
@@ -118,9 +117,25 @@ _boost_wrap_rewritten() {
       env_exports="${env_exports}export ${key}=${val_sq}; "
     fi
   done
-  run_body=$(_boost_wrap_body "$body")
-  printf '(%sexport BOOST_HOOK_META_FILE=%s; PATH=%s:${PATH:-}; %s)' \
-    "$env_exports" "$meta_file_sq" "$bindir_q" "$run_body"
+  case "$body" in
+    *'| boost'*)
+      upstream="${body%%| boost*}"
+      tail="${body#*| boost}"
+      upstream="${upstream%"${upstream##*[![:space:]]}"}"
+      upstream="${upstream#"${upstream%%[![:space:]]*}"}"
+      boost_side="(${env_exports}export BOOST_HOOK_META_FILE=${meta_file_sq}; ${boost_exe_sq})"
+      wrapped="(${upstream} | ${boost_side}${tail})"
+      _boost_wrap_body "$wrapped"
+      ;;
+    *)
+      local bindir bindir_q
+      bindir=$(_boost_path_for_wrap "$(dirname "$BOOST_EXE")")
+      bindir_q="'$(_boost_bash_sq "$bindir")'"
+      wrapped=$(_boost_wrap_body "$body")
+      printf '(%sexport BOOST_HOOK_META_FILE=%s; PATH=%s:${PATH:-}; %s)' \
+        "$env_exports" "$meta_file_sq" "$bindir_q" "$wrapped"
+      ;;
+  esac
 }
 # Detached Stop-hook sync: forward gh auth + PATH (hooks often run with a minimal env).
 _boost_run_detached_sync() {
@@ -137,6 +152,10 @@ _boost_run_detached_sync() {
     [ -n "${GH_HOST:-}" ] && export GH_HOST
     [ -n "${XDG_CONFIG_HOME:-}" ] && export XDG_CONFIG_HOME
     [ -n "$hmeta" ] && export BOOST_HOOK_META="$hmeta"
+    if [ "${BOOST_HOOK_SYNC_FOREGROUND:-}" = "1" ]; then
+      "$BOOST_EXE" sync >/dev/null 2>&1 < /dev/null
+      return
+    fi
     nohup "$BOOST_EXE" sync >/dev/null 2>&1 < /dev/null & disown
   ) >/dev/null 2>&1
 }
@@ -154,6 +173,8 @@ HMETA=$(echo "$INPUT" | jq -c '
       agent_type: (
         if ($in.agent_type // "") != "" then $in.agent_type
         elif ($in.conversation_id // "") != "" then "cursor"
+        elif (($in.transcript_path // $in.transcriptPath // "") | test("/agent-transcripts/"; "i")) then "cursor"
+        elif (($in.transcript_path // $in.transcriptPath // "") | test("/\\.copilot/session-state/"; "i")) then "copilot"
         elif ($in.session_id // "") != "" then "claude_code"
         else "unknown"
         end

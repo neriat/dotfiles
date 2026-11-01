@@ -2,3 +2,4 @@
 # and is backed up in 1Password. Belt-and-braces in case it is ever copied here.
 key.txt
 *.age.key
+.boost/
