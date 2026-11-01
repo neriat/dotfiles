@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "prompt-engineer",
+  "owner": "Jeffallan",
+  "repo": "claude-skills",
+  "path": "skills/prompt-engineer",
+  "branch": "main",
+  "sha": "fdad8a9027887c34afec507840f1235bca33131a",
+  "source": "manual"
+}

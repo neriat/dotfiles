@@ -110,3 +110,6 @@ Library/**
 .claude/policy-limits.json
 .claude/remote-settings.json
 .claude/.settings.lock
+.claude/skills/synced
+.claude/skills/.trash
+**/__pycache__

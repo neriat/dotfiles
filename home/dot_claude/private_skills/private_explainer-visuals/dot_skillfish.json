@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "explainer-visuals",
+  "owner": "petekp",
+  "repo": "agent-skills",
+  "path": "skills/explainer-visuals",
+  "branch": "main",
+  "sha": "0f2d1297868b37c7f14cf4106b6b5f5c537e0324",
+  "source": "manual"
+}

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "database-optimizer",
+  "owner": "Jeffallan",
+  "repo": "claude-skills",
+  "path": "skills/database-optimizer",
+  "branch": "main",
+  "sha": "32bb28c105211a10f04dadc50ecdcce6bdeea746",
+  "source": "manual"
+}
