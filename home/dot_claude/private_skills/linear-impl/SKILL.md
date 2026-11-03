@@ -1,6 +1,6 @@
 ---
 name: linear-impl
-description: Turn a prompt (or the plan made in this conversation) into shipped work — create a Linear ticket (team EXP by default, assigned to me), cut a git worktree on branch `cursor/EXP-<n>-<slug>` from origin/dev|main|master, implement the ticket, commit, push, and open a draft PR. Use when the user invokes /linear-impl.
+description: Turn a prompt (or the plan made in this conversation) into shipped work — create a Linear ticket (team EXP by default, assigned to me), cut a git worktree on branch `<type>/EXP-<n>-<slug>` from origin/dev|main|master, implement the ticket, commit, push, and open a draft PR. Use when the user invokes /linear-impl.
 argument-hint: "<task title/description> [team=EXP] [repo=<path>]"
 disable-model-invocation: true
 ---
@@ -43,9 +43,11 @@ naming convention and leaves junk behind.
 
 ## 4. Create the worktree and branch
 
-1. **Branch name**: `cursor/<IDENTIFIER>-<slug>` — the identifier keeps its case, the slug is the
-   title in lowercase kebab-case, ASCII only, ≤ ~40 chars, trimmed at a word boundary.
-   Example: `cursor/EXP-123-add-retry-to-price-fetcher`.
+1. **Branch name**: `<type>/<IDENTIFIER>-<slug>` — `<type>` is the Conventional Commits type the
+   change will be committed under (`feat`, `fix`, `refactor`, `chore`, …), the identifier keeps its
+   case, the slug is the title in lowercase kebab-case, ASCII only, ≤ ~40 chars, trimmed at a word
+   boundary. Example: `feat/EXP-123-add-retry-to-price-fetcher`. The push ruleset rejects any
+   other prefix, `cursor/` included.
 2. **Base branch**: `git -C <repo> fetch origin`, then pick the first that exists:
    `origin/dev` → `origin/main` → `origin/master`
    (check each with `git -C <repo> show-ref --verify --quiet refs/remotes/origin/<b>`).
@@ -56,7 +58,7 @@ naming convention and leaves junk behind.
 4. **Create it**:
    `git -C <repo> worktree add <repo>/.claude/worktrees/<IDENTIFIER>-<slug> -b <branch> origin/<base>`
    Create it manually rather than with `EnterWorktree(name=…)` — that tool picks its own branch
-   name, and the `cursor/EXP-…` convention matters (Linear links branches to tickets by it).
+   name, and the `<type>/EXP-…` convention matters (Linear links branches to tickets by it).
 5. **Switch in**: call `EnterWorktree` with `path=<that worktree path>` (load it via ToolSearch if
    it's deferred). If it refuses — e.g. `repo=` points outside the launch directory — carry on
    using absolute paths and `git -C <worktree>`, and mention that in the final report.

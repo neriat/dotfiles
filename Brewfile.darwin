@@ -7,6 +7,9 @@ tap "aiherd-dev/aiherd"
 # --- macOS-only formulae ---
 brew "cocoapods"
 brew "xcodegen"
+brew "swift-format"
+brew "swiftlint"
+brew "create-dmg"
 brew "mas"                  # Mac App Store CLI, drives the mas section below
 brew "terminal-notifier"
 brew "leaperone/smctl/smctl"

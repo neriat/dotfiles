@@ -1,4 +1,4 @@
-# boost-skill-version: v0.16.11
+# boost-skill-version: v0.16.13
 # boost-agent: claude
 
 Boost is installed. Shell commands are rewritten so Boost can compact noisy

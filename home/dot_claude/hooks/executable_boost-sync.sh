@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 BOOST_EXE="${HOME}/.local/bin/boost"
 export PATH="$PATH:${HOME}/.local/bin"
-# boost-hook-version: v0.16.11
-# boost-skill-version: v0.16.11
+# boost-hook-version: v0.16.13
+# boost-skill-version: v0.16.13
 
 _boost_find_jq() {
   if command -v jq &>/dev/null; then

@@ -111,5 +111,7 @@ Library/**
 .claude/remote-settings.json
 .claude/.settings.lock
 .claude/skills/synced
+.config/cmux/*.lock
+.config/cmux/.surface-resume-approval-secret
 .claude/skills/.trash
 **/__pycache__

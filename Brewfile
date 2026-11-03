@@ -13,6 +13,7 @@ tap "oven-sh/bun"
 brew "starship"
 brew "thefuck"
 brew "tmux"
+brew "fish"
 brew "fzf"
 brew "stow"
 
@@ -55,6 +56,11 @@ brew "solidity"
 brew "protobuf"
 brew "cmake"
 brew "make"
+brew "pyenv"
+brew "pipx"
+brew "bison"
+brew "flex"
+brew "mcpp"
 
 # --- databases ---
 brew "postgresql@16"
@@ -72,6 +78,11 @@ brew "hashicorp/tap/terraform"
 brew "cloudflared"
 brew "allcloud-io/tools/clisso"
 brew "docker-credential-helper"
+
+# --- documents / typesetting ---
+brew "tectonic"            # LaTeX engine
+brew "poppler"             # PDF utilities (pdftotext, pdftoppm)
+brew "pandoc-crossref"
 
 # --- misc ---
 brew "chezmoi"
